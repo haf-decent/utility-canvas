@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <title>Test</title>
+    <style></style>
+    <script src="dist/utility-canvas.min.js"></script>
+</head>
+<body>
+    <script>
+        // create utility canvas, add to body
+        const uCanvas = new UtilityCanvas({ width: 500, height: 500, parent: document.body });
+        // red square in top left
+        uCanvas.rectangle({ width: 100, height: 100, fill: 'red' })
+            // cyan square on diagonal (global color is now cyan)
+            .setColor('cyan').rectangle({ width: 100, height: 100, position: { x: 100, y: 100 }, fill: true })
+            // yellow square on diagonal
+            .rectangle({ width: 100, height: 100, position: { x: 200, y: 200 }, fill: 'yellow' })
+            // square on diagonal, global color is cyan
+            .rectangle({ width: 100, height: 100, position: { x: 300, y: 300 }, fill: true })
+            // blue square on diagonal
+            .rectangle({ width: 100, height: 100, position: { x: 400, y: 400 }, fill: 'blue' });
+    </script>
+</body>
+</html>
