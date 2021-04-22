@@ -40,15 +40,15 @@ class UtilityCanvas {
 
     // Fills
     fill(color = null) {
+        this.ctx.save();
         this.setColor(color);
         this.ctx.fill();
+        this.ctx.restore();
         return this;
     }
     fillColor(color) {
-        this.ctx.save();
         this.setColor(color);
         this.ctx.fillRect(0, 0, this.width, this.height);
-        this.ctx.restore();
         return this;
     }
     fillTexture(image, preserveAspect = false) {
@@ -109,8 +109,10 @@ class UtilityCanvas {
         return this;
     }
     stroke(strokeOptions = {}) {
+        this.ctx.save();
         this.setStroke(strokeOptions);
         this.ctx.stroke();
+        this.ctx.restore();
         return this;
     }
     closePath() {
@@ -119,19 +121,40 @@ class UtilityCanvas {
     }
 
     // Shapes
-    rectangle({ position: { x = 0, y = 0 } = {}, width = this.width, height = this.height }) {
-        this.ctx.rect(x, y, width, height);
+    rectangle({ position: { x = 0, y = 0 } = {}, width = this.width, height = this.height, fill = false, stroke = false }) {
+        if (fill || stroke) {
+            this.ctx.beginPath();
+            this.ctx.rect(x, y, width, height);
+            this.ctx.closePath();
+            if (fill) this.fill(fill);
+            if (stroke) this.stroke(stroke);
+        }
+        else this.ctx.rect(x, y, width, height);
         return this;
     }
-    arc({ center: { x, y }, radius, startAngle = 0, endAngle = 2 * Math.PI, cc = false }) {
-        this.ctx.arc(x, y, radius, startAngle, endAngle, cc);
+    arc({ center: { x, y }, radius, startAngle = 0, endAngle = 2 * Math.PI, cc = false, fill = false, stroke = false }) {
+        if (fill || stroke) {
+            this.ctx.beginPath();
+            this.ctx.arc(x, y, radius, startAngle, endAngle, cc);
+            this.ctx.closePath();
+            if (fill) this.fill(fill);
+            if (stroke) this.stroke(stroke);
+        }
+        else this.ctx.arc(x, y, radius, startAngle, endAngle, cc);
         return this;
     }
-    ellipse({ center: { x, y }, radius: { x: rx, y: ry }, rotation = 0, startAngle = 0, endAngle = 2 * Math.PI, cc = false }) {
-        this.ctx.ellipse(x, y, rx, ry, rotation, startAngle, endAngle, cc);
+    ellipse({ center: { x, y }, radius: { x: rx, y: ry }, rotation = 0, startAngle = 0, endAngle = 2 * Math.PI, cc = false, fill = false, stroke = false }) {
+        if (fill || stroke) {
+            this.ctx.beginPath();
+            this.ctx.ellipse(x, y, rx, ry, rotation, startAngle, endAngle, cc);
+            this.ctx.closePath();
+            if (fill) this.fill(fill);
+            if (stroke) this.stroke(stroke);
+        }
+        else this.ctx.ellipse(x, y, rx, ry, rotation, startAngle, endAngle, cc);
         return this;
     }
-    roundedRectangle({ position: { x = 0, y = 0 }, width, height, radius }) {
+    roundedRectangle({ position: { x = 0, y = 0 }, width, height, radius, fill = false, stroke = false }) {
         if (typeof radius === 'number') radius = { tl: radius, tr: radius, bl: radius, br: radius }
         const { tl, tr, bl, br } = radius;
         
@@ -150,6 +173,8 @@ class UtilityCanvas {
         // TL
         this.ctx.arc(x + tl, y + tl, tl, Math.PI, Math.PI / 2);
         this.ctx.closePath();
+        if (fill) this.fill(fill);
+        if (stroke) this.stroke(stroke);
         return this;
     }
 
@@ -272,6 +297,8 @@ Object.defineProperty(UtilityCanvas, 'COMPOSITE', {
     writable: false,
     enumerable: true
 });
+
+window.UtilityCanvas = UtilityCanvas;
 
 export { UtilityCanvas, clamp, hexToRgb }
 export default UtilityCanvas
