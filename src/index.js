@@ -177,9 +177,24 @@ class UtilityCanvas {
         if (stroke) this.stroke(stroke);
         return this;
     }
+    draw({ points = [], closed = true, fill = false, stroke = false } = {}) {
+        if (!Array.isArray(points) || !points.length) return this;
+        this.ctx.beginPath();
+        this.ctx.moveTo(points[0]);
+        for (let i = 1; i < points.length; i++) {
+            this.ctx.lineTo(points[i]);
+        }
+        if (closed) {
+            this.ctx.closePath();
+            if (fill) this.fill(fill);
+        }
+        if (stroke) this.stroke(stroke);
+        return this;
+    }
+    // TODO: Add other draw types (curves)
 
     // Textures
-    draw({ image, position: { x = 0, y = 0 } = {}, rotation = 0, scale = 1 }) {
+    drawTexture({ image, position: { x = 0, y = 0 } = {}, rotation = 0, scale = 1 }) {
         this.ctx.save();
         this.ctx.translate(x, y);
         this.ctx.rotate(rotation);
