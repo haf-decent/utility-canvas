@@ -40,6 +40,12 @@ class UtilityCanvas {
         if (color) this.ctx.strokeStyle = color;
         return this;
     }
+    setCompositeOperation(operation) {
+        if (UtilityCanvas.COMPOSITE[ operation ]) this.ctx.globalCompositeOperation = UtilityCanvas.COMPOSITE[ operation ];
+        else if (operation in Object.values(UtilityCanvas.COMPOSITE)) this.ctx.globalCompositeOperation = operation;
+        else console.warn(`Composite operation: '${operation}' does not exist.`);
+        return this;
+    }
 
     // Fills
     fill(color = null) {
@@ -60,7 +66,7 @@ class UtilityCanvas {
         return this;
     }
     fillOrFitTextureWithAspect({ 
-        image, fill = true, aspect, 
+        image, fill = true, aspect = null, 
         anchors = { x: 'center', y: 'center' }, 
         offset = { x: 0, y: 0 },
         margin = { t: 0, l: 0, r: 0, b: 0 }
@@ -239,7 +245,42 @@ class UtilityCanvas {
             image.src = data;
         });
     }
+    // TODO: screenshot of current webpage
 }
+
+// https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/globalCompositeOperation
+Object.defineProperty(UtilityCanvas, 'COMPOSITE', {
+    value: {
+        SOURCE_OVER: 'source-over',
+        SOURCE_IN: 'source-in',
+        SOURCE_OUT: 'source-out',
+        SOURCE_ATOP: 'source-atop',
+        DESTINATION_OVER: 'destination-over',
+        DESTINATION_IN: 'destination-in',
+        DESTINATION_OUT: 'destination-out',
+        DESTINATION_ATOP: 'destination-atop',
+        LIGHTER: 'lighter',
+        COPY: 'copy',
+        XOR: 'xor',
+        MULTIPLY: 'multiply',
+        SCREEN: 'screen',
+        OVERLAY: 'overlay',
+        DARKEN: 'darken',
+        LIGHTEN: 'lighten',
+        COLOR_DODGE: 'color-dodge',
+        COLOR_BURN: 'color-burn',
+        HARD_LIGHT: 'hard-light',
+        SOFT_LIGHT: 'soft-light',
+        DIFFERENCE: 'difference',
+        EXCLUSION: 'exclusion',
+        HUE: 'hue',
+        SATURATION: 'saturation',
+        COLOR: 'color',
+        LUMINOSITY: 'luminosity'
+    },
+    writable: false,
+    enumerable: true
+});
 
 export { UtilityCanvas, clamp, hexToRgb }
 export default UtilityCanvas
