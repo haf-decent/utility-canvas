@@ -119,7 +119,7 @@ class UtilityCanvas {
     }
 
     // Shapes
-    rectangle({ position: { x = 0, y = 0 }, width = this.width, height = this.height }) {
+    rectangle({ position: { x = 0, y = 0 } = {}, width = this.width, height = this.height }) {
         this.ctx.rect(x, y, width, height);
         return this;
     }
@@ -154,7 +154,7 @@ class UtilityCanvas {
     }
 
     // Textures
-    draw({ image, position: { x, y } = {}, rotation = 0, scale = 1 }) {
+    draw({ image, position: { x = 0, y = 0 } = {}, rotation = 0, scale = 1 }) {
         this.ctx.save();
         this.ctx.translate(x, y);
         this.ctx.rotate(rotation);
@@ -182,7 +182,7 @@ class UtilityCanvas {
         this.ctx.restore();
         return this;
     }
-    removeTexture({ image, position: { x, y }, rotation = 0, scale = 1 }) {
+    removeTexture({ image, position: { x = 0, y = 0 } = {}, rotation = 0, scale = 1 }) {
         this.ctx.save();
         this.ctx.translate(x, y);
         this.ctx.rotate(rotation);
