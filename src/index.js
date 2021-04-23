@@ -2,7 +2,7 @@ import { clamp, hexToRgb } from './utils.js';
 
 class UtilityCanvas {
     constructor({ canvas = document.createElement('canvas'), width = 1024, height = 1024, parent = null } = {}) {
-        this.canvas = canvas;
+        this.el = canvas;
         this.width = canvas.width = width;
         this.height = canvas.height = height;
         this.ctx = canvas.ctx = canvas.getContext('2d');
@@ -10,8 +10,8 @@ class UtilityCanvas {
     }
 
     resize({ width = this.width, height = this.height }) {
-        this.width = this.canvas.width = width;
-        this.height = this.canvas.height = height;
+        this.width = this.el.width = width;
+        this.height = this.el.height = height;
         return this;
     }
 
@@ -263,7 +263,7 @@ class UtilityCanvas {
         link.click();
     }
     getDataURL(format = 'image/jpeg', quality = 1) {
-        return this.canvas.toDataURL(format, quality);
+        return this.el.toDataURL(format, quality);
     }
     setDataURL(data) {
         const self = this;
