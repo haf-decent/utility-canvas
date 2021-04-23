@@ -154,7 +154,7 @@ class UtilityCanvas {
         else this.ctx.ellipse(x, y, rx, ry, rotation, startAngle, endAngle, cc);
         return this;
     }
-    roundedRectangle({ position: { x = 0, y = 0 }, width, height, radius, fill = false, stroke = false }) {
+    roundedRectangle({ position: { x = 0, y = 0 }, width = this.width, height = this.height, radius, fill = false, stroke = false }) {
         if (typeof radius === 'number') radius = { tl: radius, tr: radius, bl: radius, br: radius }
         const { tl, tr, bl, br } = radius;
         
