@@ -52,11 +52,11 @@ class UtilityCanvas {
         return this;
     }
     fillTexture(image, preserveAspect = false) {
-        if (preserveAspect) return this.fillOrFitTextureWithAspect({ image, fill: preserveAspect === 'fill' });
+        if (preserveAspect) return this.fillOrFitTexture({ image, fill: preserveAspect === 'fill' });
         else this.ctx.drawImage(image, 0, 0, this.width, this.height);
         return this;
     }
-    fillOrFitTextureWithAspect({ 
+    fillOrFitTexture({ 
         image, fill = true, aspect = null, 
         anchors = { x: 'center', y: 'center' }, 
         offset = { x: 0, y: 0 },
