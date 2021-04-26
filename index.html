@@ -4,24 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <title>Test</title>
-    <style></style>
+    <style>
+        #image {
+            display: none;
+        }
+    </style>
     <script src="dist/utility-canvas.min.js"></script>
 </head>
 <body>
+    <img id="image" src="https://image-utils.netlify.app/assets/jeff.png" width="250" height="187"/>
     <script>
-        // create utility canvas, add to body
-        const uCanvas = new UtilityCanvas({ width: 500, height: 500, parent: document.body });
-        // red square in top left
-        uCanvas.rectangle({ width: 100, height: 100, fill: true, color: 'red' })
-            // cyan square on diagonal (global color is now cyan)
-            .setColor('cyan').rectangle({ width: 100, height: 100, offset: { x: 100, y: 100 }, fill: true })
-            // yellow square on diagonal
-            .rectangle({ width: 100, height: 100, offset: { x: 200, y: 200 }, fill: true, color: 'yellow' })
-            // square on diagonal, global color is cyan
-            .rectangle({ width: 100, height: 100, offset: { x: 300, y: 300 }, fill: true, stroke: true, strokeOptions: { thickness: 10, color: 'black' }, alpha: 0.5 })
-            // blue square on diagonal
-            .rectangle({ width: 100, height: 100, offset: { x: 400, y: 400 }, fill: true, color: 'blue' })
-            .arc({ fill: true, color: 'orange', operation: UtilityCanvas.COMPOSITE.BEHIND });
+        window.onload = () => {
+            const img = document.getElementById('image');
+            // create utility canvas, add to body
+            const uCanvas = new UtilityCanvas({ width: 500, height: 500, parent: document.body });
+            // red square in top left
+            uCanvas.rectangle({ width: 100, height: 100, color: 'red' })
+                // cyan square on diagonal (global color is now cyan)
+                .setColor('cyan').rectangle({ width: 100, height: 100, offset: { x: 100, y: 100 }, fill: true })
+                // yellow circle on diagonal
+                .arc({ radius: 50, color: 'yellow' })
+                // square on diagonal, global color is cyan, compensate for border thickness
+                .rectangle({ width: 90, height: 90, offset: { x: 305, y: 305 }, fill: true, alpha: 0.5 }).stroke({ strokeOptions: { thickness: 10, color: 'black' } })
+                // blue square on diagonal
+                .rectangle({ width: 100, height: 100, offset: { x: 400, y: 400 }, color: 'blue' })
+                // fill background with image pattern
+                .fillPattern(img, { repeat: { x: 5, y: 6.5 }, margin: { x: 40, y: 40 }, operation: UtilityCanvas.COMPOSITE.BEHIND })
+                // draw diagonal lines
+                .line([[ 0, 0 ], [ uCanvas.width, uCanvas.height ]], { closed: false, stroke: true })
+                .line([[ uCanvas.width, 0 ], [ 0, uCanvas.height ]], { closed: false, stroke: true });
+        }
     </script>
 </body>
 </html>
