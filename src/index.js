@@ -24,7 +24,7 @@ UtilityCanvas.prototype.clear = function() {
 // Settings
 UtilityCanvas.prototype._parseSettings = function(settings) {
     if (!settings) return this;
-    const { color = null, strokeOptions = {}, alpha = null, operation = null } = settings;
+    const { color = undefined, strokeOptions = {}, alpha = undefined, operation = undefined } = settings;
     this.setColor(color);
     this.setStroke(strokeOptions);
     this.setAlpha(alpha);
@@ -48,7 +48,7 @@ UtilityCanvas.prototype.setStroke = function({ thickness = this.ctx.lineWidth, c
 
 UtilityCanvas.prototype.setCompositeOperation = function(operation = this.ctx.globalCompositeOperation) {
     if (UtilityCanvas.COMPOSITE[ operation ]) this.ctx.globalCompositeOperation = UtilityCanvas.COMPOSITE[ operation ];
-    else if (operation in Object.values(UtilityCanvas.COMPOSITE)) this.ctx.globalCompositeOperation = operation;
+    else if (Object.values(UtilityCanvas.COMPOSITE).includes(operation)) this.ctx.globalCompositeOperation = operation;
     else console.warn(`Composite operation: '${operation}' does not exist.`);
 
     return this;
