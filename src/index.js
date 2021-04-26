@@ -200,12 +200,12 @@ UtilityCanvas.prototype.rectangle = function({
 }) {
     this.ctx.save();
     this._parseSettings(settings);
-    if (fill || stroke) {
+    if (fill || stroke || settings.color || settings.strokeOptions) {
         this.ctx.beginPath();
         this.ctx.rect(x, y, width, height);
         this.ctx.closePath();
-        if (fill) this.fill(fill);
-        if (stroke) this.stroke(stroke);
+        if (fill || settings.color) this.fill(fill);
+        if (stroke || settings.strokeOptions) this.stroke(stroke);
     }
     else this.ctx.rect(x, y, width, height);
     this.ctx.restore();
@@ -221,12 +221,12 @@ UtilityCanvas.prototype.arc = function({
 }) {
     this.ctx.save();
     this._parseSettings(settings);
-    if (fill || stroke) {
+    if (fill || stroke || settings.color || settings.strokeOptions) {
         this.ctx.beginPath();
         this.ctx.arc(x, y, radius, startAngle, endAngle, cc);
         this.ctx.closePath();
-        if (fill) this.fill(fill);
-        if (stroke) this.stroke(stroke);
+        if (fill || settings.color) this.fill(fill);
+        if (stroke || settings.strokeOptions) this.stroke(stroke);
     }
     else this.ctx.arc(x, y, radius, startAngle, endAngle, cc);
     this.ctx.restore();
@@ -242,12 +242,12 @@ UtilityCanvas.prototype.ellipse = function({
 }) {
     this.ctx.save();
     this._parseSettings(settings);
-    if (fill || stroke) {
+    if (fill || stroke || settings.color || settings.strokeOptions) {
         this.ctx.beginPath();
         this.ctx.ellipse(x, y, rx, ry, rotation, startAngle, endAngle, cc);
         this.ctx.closePath();
-        if (fill) this.fill(fill);
-        if (stroke) this.stroke(stroke);
+        if (fill || settings.color) this.fill(fill);
+        if (stroke || settings.strokeOptions) this.stroke(stroke);
     }
     else this.ctx.ellipse(x, y, rx, ry, rotation, startAngle, endAngle, cc);
     this.ctx.restore();
@@ -280,8 +280,8 @@ UtilityCanvas.prototype.roundedRectangle = function({
     // TL
     this.ctx.arc(x + tl, y + tl, tl, Math.PI, Math.PI / 2);
     this.ctx.closePath();
-    if (fill) this.fill(fill);
-    if (stroke) this.stroke(stroke);
+    if (fill || settings.color) this.fill(fill);
+    if (stroke || settings.strokeOptions) this.stroke(stroke);
     this.ctx.restore();
 
     return this;
@@ -297,11 +297,11 @@ UtilityCanvas.prototype.polygon = function(points = [], { closed = true, fill = 
     for (let i = 1; i < points.length; i++) {
         this.ctx.lineTo(...points[i]);
     }
-    if (closed || fill) {
+    if (closed || fill || settings.color) {
         this.ctx.closePath();
-        if (fill) this.fill(fill);
+        if (fill || settings.color) this.fill(fill);
     }
-    if (stroke) this.stroke(stroke);
+    if (stroke || settings.strokeOptions) this.stroke(stroke);
     this.ctx.restore();
 
     return this;
