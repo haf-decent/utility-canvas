@@ -15,7 +15,10 @@ UtilityCanvas.prototype.resize = function({ width = this.width, height = this.he
     return this;
 }
 
-UtilityCanvas.prototype.clearRect = function({ offset: { x = 0, y = 0 } = {}, width = this.width, height = this.height } = {}) {
+UtilityCanvas.prototype.clearRect = function({
+    offset: { x = 0, y = 0 } = {}, 
+    width = this.width, height = this.height 
+} = {}) {
     this.ctx.clearRect(x, y, width, height);
 
     return this;
@@ -74,7 +77,11 @@ UtilityCanvas.prototype.fill = function(settings) {
     return this;
 }
 
-UtilityCanvas.prototype.fillRect = function({ offset: { x = 0, y = 0 } = {}, width = this.width, height = this.height, ...settings } = {}) {
+UtilityCanvas.prototype.fillRect = function({
+    offset: { x = 0, y = 0 } = {}, 
+    width = this.width, height = this.height, 
+    ...settings
+} = {}) {
     this.ctx.save();
     this._parseSettings(settings);
     this.ctx.fillRect(x, y, width, height);
@@ -156,7 +163,7 @@ UtilityCanvas.prototype.fillPattern = function(image, {
     if (ax === 'center') x -= (Math.ceil(repeat.x) * size.x + mx - this.width) / 2;
     else if (ax === 'right') x -= Math.ceil(repeat.x) * size.x + mx - this.width;
     if (ay === 'center') y -= (Math.ceil(repeat.y) * size.y + my - this.height) / 2;
-    if (ay === 'bottom') y -= Math.ceil(repeat.y) * size.y + my - this.height;
+    else if (ay === 'bottom') y -= Math.ceil(repeat.y) * size.y + my - this.height;
     this.ctx.save();
     this._parseSettings(settings);
     for (let i = 0; i < repeat.x; i++) {
@@ -194,7 +201,8 @@ UtilityCanvas.prototype.closePath = function() {
 
 // Shapes
 UtilityCanvas.prototype.rectangle = function({ 
-    offset: { x = 0, y = 0 } = {}, width = this.width, height = this.height, 
+    offset: { x = 0, y = 0 } = {}, 
+    width = this.width, height = this.height, 
     fill = false, stroke = false, 
     ...settings 
 }) {
@@ -214,7 +222,8 @@ UtilityCanvas.prototype.rectangle = function({
 }
 
 UtilityCanvas.prototype.arc = function({
-    center: { x = this.width / 2, y = this.height / 2 } = {}, radius = Math.min(this.width, this.height) / 2, 
+    center: { x = this.width / 2, y = this.height / 2 } = {}, 
+    radius = Math.min(this.width, this.height) / 2, 
     startAngle = 0, endAngle = 2 * Math.PI, cc = false, 
     fill = false, stroke = false, 
     ...settings 
@@ -235,7 +244,8 @@ UtilityCanvas.prototype.arc = function({
 }
 
 UtilityCanvas.prototype.ellipse = function({ 
-    center: { x = this.width / 2, y = this.height / 2 } = {}, radius: { x: rx = this.width / 2, y: ry = this.height / 2 }, rotation = 0, 
+    center: { x = this.width / 2, y = this.height / 2 } = {}, 
+    radius: { x: rx = this.width / 2, y: ry = this.height / 2 } = {}, rotation = 0, 
     startAngle = 0, endAngle = 2 * Math.PI, cc = false, 
     fill = false, stroke = false,
     ...settings 
@@ -256,7 +266,8 @@ UtilityCanvas.prototype.ellipse = function({
 }
 
 UtilityCanvas.prototype.roundedRectangle = function({ 
-    offset: { x = 0, y = 0 } = {}, width = this.width, height = this.height, radius, 
+    offset: { x = 0, y = 0 } = {}, 
+    width = this.width, height = this.height, radius, 
     fill = false, stroke = false,
     ...settings
 }) {
@@ -287,7 +298,10 @@ UtilityCanvas.prototype.roundedRectangle = function({
     return this;
 }
 
-UtilityCanvas.prototype.polygon = function(points = [], { closed = true, fill = false, stroke = false, ...settings } = {}) {
+UtilityCanvas.prototype.polygon = function(points = [], {
+    closed = true, fill = false, stroke = false, 
+    ...settings 
+} = {}) {
     if (!Array.isArray(points) || !points.length) return this;
 
     this.ctx.save();
@@ -314,7 +328,10 @@ UtilityCanvas.prototype.line = function(points = [], { closed = false, stroke = 
 // TODO: Add other draw types (curves)
 
 // Images
-UtilityCanvas.prototype.drawImage = function(image, { position: { x = 0, y = 0 } = {}, rotation = 0, scale = 1, ...settings }) {
+UtilityCanvas.prototype.drawImage = function(image, { 
+    position: { x = 0, y = 0 } = {}, rotation = 0, scale = 1, 
+    ...settings 
+}) {
     this.ctx.save();
     this._parseSettings(settings);
     this.ctx.translate(x, y);
