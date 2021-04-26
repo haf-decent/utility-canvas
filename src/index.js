@@ -106,7 +106,7 @@ UtilityCanvas.prototype.fillOrFitImage = function(image, {
     margin = { t: 0, l: 0, r: 0, b: 0 },
     ...settings
 } = {}) {
-    aspect = aspect || (image.naturalHeight || image.height) / (image.naturalWidth || image.width);
+    aspect = aspect || (image.height || image.naturalHeight) / (image.width || image.naturalWidth);
     if (typeof margin === 'number') margin = { t: margin, l: margin, r: margin, b: margin }
     const { t = 0, l = 0, r = 0, b = 0 } = margin;
     const maxWidth = this.width - l - r;
@@ -205,7 +205,7 @@ UtilityCanvas.prototype.arc = function({
 }
 
 UtilityCanvas.prototype.ellipse = function({ 
-    center: { x, y }, radius: { x: rx, y: ry }, rotation = 0, 
+    center: { x = this.width / 2, y = this.height / 2 } = {}, radius: { x: rx = this.width / 2, y: ry = this.height / 2 }, rotation = 0, 
     startAngle = 0, endAngle = 2 * Math.PI, cc = false, 
     fill = false, stroke = false,
     ...settings 
@@ -263,9 +263,9 @@ UtilityCanvas.prototype.polygon = function(points = [], { closed = true, fill = 
     this.ctx.save();
     this._parseSettings(settings);
     this.ctx.beginPath();
-    this.ctx.moveTo(points[0]);
+    this.ctx.moveTo(...points[0]);
     for (let i = 1; i < points.length; i++) {
-        this.ctx.lineTo(points[i]);
+        this.ctx.lineTo(...points[i]);
     }
     if (closed || fill) {
         this.ctx.closePath();
