@@ -307,6 +307,10 @@ UtilityCanvas.prototype.polygon = function(points = [], { closed = true, fill = 
     return this;
 }
 
+UtilityCanvas.prototype.line = function(points = [], { closed = false, stroke = true, ...settings} = {}) {
+    return this.polygon(points, { closed, stroke, ...settings });
+}
+
 // TODO: Add other draw types (curves)
 
 // Images
