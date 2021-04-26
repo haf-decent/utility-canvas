@@ -148,30 +148,42 @@ UtilityCanvas.prototype.fillOrFitImage = function(image, {
 }
 
 UtilityCanvas.prototype.fillPattern = function(image, {
-    aspect = null, repeat = null, 
+    repeat = null, stagger = false, rotation = 0,
     offset: { x = 0, y = 0 } = {},
     margin: { x: mx = 0, y: my = 0 } = {}, 
     anchors: { x: ax = 'center', y: ay = 'center' } = {},
-    stagger = false,
     ...settings
 } = {}) {
-    aspect = aspect || (image.height || image.naturalHeight) / (image.width || image.naturalWidth);
+    const rotatedWidth = Math.abs(Math.cos(rotation) * this.width) + Math.abs(Math.sin(rotation) * this.height);
+    const rotatedHeight = Math.abs(Math.cos(rotation) * this.height) + Math.abs(Math.sin(rotation) * this.width);
     repeat = repeat || {
-        x: this.width / ((image.width || image.naturalWidth) + mx),
-        y: this.height / ((image.height || image.naturalHeight) + my)
+        x: rotatedWidth / ((image.width || image.naturalWidth) + mx),
+        y: rotatedHeight / ((image.height || image.naturalHeight) + my)
     }
     const size = { x: this.width / repeat.x, y: this.height / repeat.y };
-    if (ax === 'center') x -= (Math.ceil(repeat.x) * size.x + mx - this.width) / 2;
-    else if (ax === 'right') x -= Math.ceil(repeat.x) * size.x + mx - this.width;
-    if (ay === 'center') y -= (Math.ceil(repeat.y) * size.y + my - this.height) / 2;
-    else if (ay === 'bottom') y -= Math.ceil(repeat.y) * size.y + my - this.height;
+
+    if (ax === 'center') x -= (Math.ceil(repeat.x) * size.x + mx - rotatedWidth) / 2;
+    else if (ax === 'right') x -= Math.ceil(repeat.x) * size.x + mx - rotatedWidth;
+    if (ay === 'center') y -= (Math.ceil(repeat.y) * size.y + my - rotatedHeight) / 2;
+    else if (ay === 'bottom') y -= Math.ceil(repeat.y) * size.y + my - rotatedHeight;
+    // for rotated patterns, extend repeats past width/height bounds
+    const extend = {
+        x: Math.ceil(repeat.x * rotatedWidth / (2 * this.width)),
+        y: Math.ceil(repeat.y * rotatedHeight / (2 * this.height))
+    }
+
     this.ctx.save();
     this._parseSettings(settings);
-    for (let i = 0; i < repeat.x + 1; i++) {
+    if (rotation) {
+        this.ctx.translate(this.width / 2, this.height / 2);
+        this.ctx.rotate(rotation);
+        this.ctx.translate(-rotatedWidth / 2, -rotatedHeight / 2);
+    }
+    for (let i = -extend.x; i < repeat.x + extend.x; i++) {
         let offsetX = x + mx + i * size.x;
         let offsetY = y + my;
         if (stagger && stagger === 'y' && i % 2) offsetY -= size.y / 2;
-        for (let j = 0; j < repeat.y + 1; j++) {
+        for (let j = -extend.y; j < repeat.y + extend.y; j++) {
             this.ctx.drawImage(
                 image, 
                 (stagger && stagger === 'x' && j % 2) ? offsetX - size.x / 2: offsetX, 
@@ -354,16 +366,6 @@ UtilityCanvas.prototype.drawImage = function(image, {
     );
     this.ctx.restore();
 
-    return this;
-}
-
-UtilityCanvas.prototype.clear = function() {
-    this.ctx.clearRect(0, 0, this.width, this.height);
-    return this;
-}
-
-UtilityCanvas.prototype.clear = function() {
-    this.ctx.clearRect(0, 0, this.width, this.height);
     return this;
 }
 
