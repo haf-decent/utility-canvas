@@ -15,10 +15,14 @@ UtilityCanvas.prototype.resize = function({ width = this.width, height = this.he
     return this;
 }
 
-UtilityCanvas.prototype.clear = function() {
-    this.ctx.clearRect(0, 0, this.width, this.height);
+UtilityCanvas.prototype.clearRect = function({ offset: { x = 0, y = 0 } = {}, width = this.width, height = this.height } = {}) {
+    this.ctx.clearRect(x, y, width, height);
 
     return this;
+}
+
+UtilityCanvas.prototype.clear = function() {
+    return this.clearRect();
 }
 
 // Settings
