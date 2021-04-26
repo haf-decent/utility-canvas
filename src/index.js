@@ -152,6 +152,7 @@ UtilityCanvas.prototype.fillPattern = function(image, {
     offset: { x = 0, y = 0 } = {},
     margin: { x: mx = 0, y: my = 0 } = {}, 
     anchors: { x: ax = 'center', y: ay = 'center' } = {},
+    stagger = false,
     ...settings
 } = {}) {
     aspect = aspect || (image.height || image.naturalHeight) / (image.width || image.naturalWidth);
@@ -166,10 +167,18 @@ UtilityCanvas.prototype.fillPattern = function(image, {
     else if (ay === 'bottom') y -= Math.ceil(repeat.y) * size.y + my - this.height;
     this.ctx.save();
     this._parseSettings(settings);
-    for (let i = 0; i < repeat.x; i++) {
-        let offsetX = mx + i * size.x;
-        for (let j = 0; j < repeat.y; j++) {
-            this.ctx.drawImage(image, x + offsetX, y + my + j * size.y, size.x - mx, size.y - my);
+    for (let i = 0; i < repeat.x + 1; i++) {
+        let offsetX = x + mx + i * size.x;
+        let offsetY = y + my;
+        if (stagger && stagger === 'y' && i % 2) offsetY -= size.y / 2;
+        for (let j = 0; j < repeat.y + 1; j++) {
+            this.ctx.drawImage(
+                image, 
+                (stagger && stagger === 'x' && j % 2) ? offsetX - size.x / 2: offsetX, 
+                offsetY + j * size.y, 
+                size.x - mx, 
+                size.y - my
+            );
         }
     }
     this.ctx.restore();
