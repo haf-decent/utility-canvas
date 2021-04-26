@@ -140,6 +140,36 @@ UtilityCanvas.prototype.fillOrFitImage = function(image, {
     return this;
 }
 
+UtilityCanvas.prototype.fillPattern = function(image, {
+    aspect = null, repeat = null, 
+    offset: { x = 0, y = 0 } = {},
+    margin: { x: mx = 0, y: my = 0 } = {}, 
+    anchors: { x: ax = 'center', y: ay = 'center' } = {},
+    ...settings
+} = {}) {
+    aspect = aspect || (image.height || image.naturalHeight) / (image.width || image.naturalWidth);
+    repeat = repeat || {
+        x: this.width / ((image.width || image.naturalWidth) + mx),
+        y: this.height / ((image.height || image.naturalHeight) + my)
+    }
+    const size = { x: this.width / repeat.x, y: this.height / repeat.y };
+    if (ax === 'center') x -= (Math.ceil(repeat.x) * size.x + mx - this.width) / 2;
+    else if (ax === 'right') x -= Math.ceil(repeat.x) * size.x + mx - this.width;
+    if (ay === 'center') y -= (Math.ceil(repeat.y) * size.y + my - this.height) / 2;
+    if (ay === 'bottom') y -= Math.ceil(repeat.y) * size.y + my - this.height;
+    this.ctx.save();
+    this._parseSettings(settings);
+    for (let i = 0; i < repeat.x; i++) {
+        let offsetX = mx + i * size.x;
+        for (let j = 0; j < repeat.y; j++) {
+            this.ctx.drawImage(image, x + offsetX, y + my + j * size.y, size.x - mx, size.y - my);
+        }
+    }
+    this.ctx.restore();
+
+    return this;
+}
+
 // Stroke
 UtilityCanvas.prototype.beginPath = function() {
     this.ctx.beginPath();
