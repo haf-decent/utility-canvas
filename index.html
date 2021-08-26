@@ -41,8 +41,8 @@
                 // fill background with image pattern
                 .fillPattern(img, { repeat: { x: 7, y: 9 }, margin: { x: -10, y: -10 }, rotation, stagger: 'x', operation: UtilityCanvas.COMPOSITE.BEHIND })
                 // draw diagonal lines
-                .line([[ 0, 0 ], [ uCanvas.width, uCanvas.height ]], { closed: false, stroke: true })
-                .line([[ uCanvas.width, 0 ], [ 0, uCanvas.height ]], { closed: false, stroke: true });
+                .polygon([[ 0, 0 ], [ uCanvas.width, uCanvas.height ]], { closed: false, stroke: true })
+                .polygon([[ uCanvas.width, 0 ], [ 0, uCanvas.height ]], { closed: false, stroke: true });
             // uCanvas.fillPattern(img, { repeat: { x: 7, y: 9 }, margin: { x: 10, y: 10 }, rotation: Math.PI / 4, stagger: 'x' });
             // let offsetX = 0;
             // setInterval(() => {
