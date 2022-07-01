@@ -1,5 +1,17 @@
 import { clamp, hexToRgb } from './utils.js';
 
+/**
+ * @constructor
+ * Initialize a UtilityCanvas instance
+ * 
+ * @typedef {Object} CanvasConfig
+ * @property {HTMLCanvasElement} [canvas] - canvas element to wrap. If no element is specified a new one will be created
+ * @property {number} [width = 1024] - width of canvas element (px)
+ * @property {number} [height = 1024] - height of canvas element (px)
+ * @property {HTMLElement} [parent] - element to which the canvas is appended
+ *//**
+ * @param {CanvasConfig} [options = {}] 
+ */
 function UtilityCanvas({ canvas = document.createElement('canvas'), width = 1024, height = 1024, parent = null } = {}) {
     this.el = canvas;
     this.width = canvas.width = width;
@@ -8,6 +20,15 @@ function UtilityCanvas({ canvas = document.createElement('canvas'), width = 1024
     if (parent) parent.appendChild(canvas);
 }
 
+/**
+ * resize the canvas
+ * 
+ * @typedef {Object} resizeOptions
+ * @property {number} [width] - new width of the canvas (defaults to current width)
+ * @property {number} [height] - new height of the canvas (defaults to current height)
+ *//**
+ * @param {resizeOptions} options 
+ */
 UtilityCanvas.prototype.resize = function({ width = this.width, height = this.height }) {
     this.width = this.el.width = width;
     this.height = this.el.height = height;
@@ -15,6 +36,22 @@ UtilityCanvas.prototype.resize = function({ width = this.width, height = this.he
     return this;
 }
 
+/**
+ * @typedef {Object} vec2
+ * @property {number} [x = 0] - x component (generally horizontal)
+ * @property {number} [y = 0] - y component (generally vertical)
+ */
+
+/**
+ * wrapper for CanvasRenderingContext2D clearRect
+ * 
+ * @typedef {Object} rectOptions
+ * @property {vec2} [offset = {}] - offset position for top left corner of clearRect rectangle
+ * @property {number} [width] - width of clearRect rectangle (defaults to current height)
+ * @property {number} [height] - height of clearRect rectangle (defaults to current height)
+ *//**
+ * @param {rectOptions} [options = {}] 
+ */
 UtilityCanvas.prototype.clearRect = function({
     offset: { x = 0, y = 0 } = {}, 
     width = this.width, height = this.height 
@@ -24,12 +61,77 @@ UtilityCanvas.prototype.clearRect = function({
     return this;
 }
 
+/**
+ * utility function for fully clearing / resetting the canvas
+ */
 UtilityCanvas.prototype.clear = function() {
     return this.clearRect();
 }
 
 // Settings
-UtilityCanvas.prototype._parseSettings = function(settings) {
+
+/**
+ * Sets the global fillStyle to a color (name or hexcode)
+ * 
+ * @param {string | CanvasGradient | CanvasPattern} [color] - new fillStyle value (defaults to current fillStyle) 
+ */
+UtilityCanvas.prototype.setColor = function(color = this.ctx.fillStyle) {
+    this.ctx.fillStyle = color;
+
+    return this;
+}
+
+/**
+ * Sets the global strokeStyle and lineWidth options
+ * 
+ * @typedef {Object} strokeOptions
+ * @property {number} thickness - corresponds to lineWidth
+ * @property {string | CanvasGradient | CanvasPattern} [color] - new strokeStyle value (defaults to current strokeStyle)
+ *//**
+ * @param {strokeOptions} [options = {}] 
+ */
+UtilityCanvas.prototype.setStroke = function({ thickness = this.ctx.lineWidth, color = this.ctx.strokeStyle } = {}) {
+    this.ctx.lineWidth = thickness;
+    this.ctx.strokeStyle = color;
+
+    return this;
+}
+
+/**
+ * Sets the global composite operation (selected from valid UtilityCanvas.COMPOSITE operations) - defaults to current operation, warns if operation is invalid
+ * 
+ * @param {string} operation 
+ */
+UtilityCanvas.prototype.setCompositeOperation = function(operation = this.ctx.globalCompositeOperation) {
+    if (UtilityCanvas.COMPOSITE[ operation ]) this.ctx.globalCompositeOperation = UtilityCanvas.COMPOSITE[ operation ];
+    else if (Object.values(UtilityCanvas.COMPOSITE).includes(operation)) this.ctx.globalCompositeOperation = operation;
+    else console.warn(`Composite operation: '${operation}' does not exist.`);
+
+    return this;
+}
+
+/**
+ * Sets the global alpha value (0 - 1)
+ * 
+ * @param {number} [alpha] - new alpha value (defaults to current value) 
+ */
+UtilityCanvas.prototype.setAlpha = function(alpha = this.ctx.globalAlpha) {
+    this.ctx.globalAlpha = alpha;
+
+    return this;
+}
+
+/**
+ * Parses and updates the corresponding global settings
+ * 
+ * @typedef {Object} settingsOptions
+ * @property {string | CanvasGradient | CanvasPattern} [color] - new fillStyle value (defaults to current fillStyle)
+ * @property {strokeOptions} [strokeOptions = {}] - new strokeOptions object
+ * @property {number} [alpha] - new global alpha value (defaults to current alpha value)
+ *//**
+ * @param {settingsOptions} [settings = {}] 
+ */
+ UtilityCanvas.prototype._parseSettings = function(settings) {
     if (!settings) return this;
     const { color = undefined, strokeOptions = {}, alpha = undefined, operation = undefined } = settings;
     this.setColor(color);
@@ -40,34 +142,13 @@ UtilityCanvas.prototype._parseSettings = function(settings) {
     return this;
 }
 
-UtilityCanvas.prototype.setColor = function(color = this.ctx.fillStyle) {
-    this.ctx.fillStyle = color;
-
-    return this;
-}
-
-UtilityCanvas.prototype.setStroke = function({ thickness = this.ctx.lineWidth, color = this.ctx.strokeStyle } = {}) {
-    this.ctx.lineWidth = thickness;
-    this.ctx.strokeStyle = color;
-
-    return this;
-}
-
-UtilityCanvas.prototype.setCompositeOperation = function(operation = this.ctx.globalCompositeOperation) {
-    if (UtilityCanvas.COMPOSITE[ operation ]) this.ctx.globalCompositeOperation = UtilityCanvas.COMPOSITE[ operation ];
-    else if (Object.values(UtilityCanvas.COMPOSITE).includes(operation)) this.ctx.globalCompositeOperation = operation;
-    else console.warn(`Composite operation: '${operation}' does not exist.`);
-
-    return this;
-}
-
-UtilityCanvas.prototype.setAlpha = function(alpha = this.ctx.globalAlpha) {
-    this.ctx.globalAlpha = alpha;
-
-    return this;
-}
-
 // Fills
+
+/**
+ * wrapper for CanvasRenderingContext2D fill, with optional single-use settings
+ * 
+ * @param {settingsOptions} [settings]
+ */
 UtilityCanvas.prototype.fill = function(settings) {
     this.ctx.save();
     this._parseSettings(settings);
@@ -77,6 +158,11 @@ UtilityCanvas.prototype.fill = function(settings) {
     return this;
 }
 
+/**
+ * wrapper for CanvasRenderingContext2D fillRect, with optional single-use settings
+ * 
+ * @param {Object} [options]
+ */
 UtilityCanvas.prototype.fillRect = function({
     offset: { x = 0, y = 0 } = {}, 
     width = this.width, height = this.height, 
@@ -90,10 +176,21 @@ UtilityCanvas.prototype.fillRect = function({
     return this;
 }
 
+/**
+ * utility function for filling the entire canvas with a color / style
+ * 
+ * @param {settingsOptions} settings 
+ */
 UtilityCanvas.prototype.fillColor = function(settings) {
     return this.fillRect(settings);
 }
 
+/**
+ * utility function for filling the entire canvas with a color / style
+ * 
+ * @param {HTMLImageElement | HTMLCanvasElement} Image
+ * @param {settingsOptions} settings
+ */
 UtilityCanvas.prototype.fillImage = function(image, { preserveAspect = false, ...settings } = {}) {
     if (preserveAspect) return this.fillOrFitImage(image, { fill: preserveAspect === 'fill', ...settings });
     else {
@@ -199,12 +296,22 @@ UtilityCanvas.prototype.fillPattern = function(image, {
 }
 
 // Stroke
+
+/**
+ * wrapper for CanvasRenderingContext2D beginPath
+ * 
+ */
 UtilityCanvas.prototype.beginPath = function() {
     this.ctx.beginPath();
 
     return this;
 }
 
+/**
+ * applies CanvasRenderingContext2D stroke with optional settings
+ * 
+ * @param {strokeOptions} settings
+ */
 UtilityCanvas.prototype.stroke = function(settings) {
     this.ctx.save();
     this._parseSettings(settings);
@@ -214,6 +321,10 @@ UtilityCanvas.prototype.stroke = function(settings) {
     return this;
 }
 
+/**
+ * wrapper for CanvasRenderingContext2D closePath
+ * 
+ */
 UtilityCanvas.prototype.closePath = function() {
     this.ctx.closePath();
 
