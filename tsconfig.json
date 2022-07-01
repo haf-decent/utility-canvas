@@ -1,11 +1,16 @@
 {
-    "compilerOptions": {
-      "target": "esnext",
-      "module": "commonjs",
-      "declaration": true,
-      "outDir": "./dist",
-      "strict": true
-    },
-    "include": ["src"],
-    "exclude": ["node_modules", "**/__tests__/*"]
-  }
+	"compilerOptions": {
+		"target": "esnext",
+		"module": "commonjs",
+		"declaration": true,
+		"outDir": "./dist",
+		"strict": true
+	},
+	"include": [
+		"src"
+	],
+	"exclude": [
+		"node_modules",
+		"**/__tests__/*"
+	]
+}
