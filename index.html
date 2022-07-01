@@ -79,16 +79,16 @@
 					color: 'blue'
 				})
 				// draw diagonal lines
-				.polygon(
+				.polyline(
 					[[ 0, 0 ], [ canvas.width, canvas.height ]],
 					{ closed: false, stroke: true }
 				)
-				.polygon(
+				.polyline(
 					[[ canvas.width, 0 ], [ 0, canvas.height ]],
 					{ closed: false, stroke: true }
 				)
-				// add rotating polygonal shape (hexagon) inside circle
-				.shape({
+				// add rotating polygon (hexagon) inside circle
+				.polygon({
 					sides: 6,
 					radius: x,
 					rotation: time / 1000 * Math.PI / 10,
