@@ -21,6 +21,21 @@ const uCanvas = new UtilityCanvas({
 })
 ```
 
+## Properties
+The UtilityCanvas constructor exposes the static `COMPOSITE` property, which is a list of more intuitive, human-readable operation names for use in [setCompositeOperation](#setcompositeoperation)
+
+#### el
+the canvas element attached to this instance
+
+#### width
+width of canvas in pixels
+
+#### height
+height of canvas in pixels
+
+#### ctx
+the CanvasRenderingContext2D fetched by running `canvas.getContext('2d')`
+
 ## Methods
 The UtilityCanvas class exposes many utility methods that wrap and extend familiar [CanvasRenderingContext2D](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D) methods. These methods all return `this`, which allows you to chain method calls:
 ```js
