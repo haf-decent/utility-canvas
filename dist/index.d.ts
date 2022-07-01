@@ -24,7 +24,7 @@ declare type Anchors = {
     y?: 'top' | 'center' | 'bottom';
 };
 declare type Aspect = 'fill' | 'fit' | boolean;
-declare type PolygonPoints = [number, number][];
+declare type PolylinePoints = [number, number][];
 declare type ArcSettings = {
     center?: Vector2;
     radius?: number;
@@ -33,7 +33,7 @@ declare type ArcSettings = {
     cc?: boolean;
 };
 declare type EllipseSettings = Omit<ArcSettings, 'radius'> & {
-    radii?: Vector2;
+    radius?: Vector2;
     rotation?: number;
 };
 declare type CanvasFill = string | CanvasGradient | CanvasPattern;
@@ -59,12 +59,13 @@ declare type SizeSettings = {
 declare type OffsetSettings = SizeSettings & {
     offset?: OptionalVector2;
 };
-declare type ShapeSettings = {
+declare type PolygonSettings = {
     sides: number;
     sideLength?: number;
     radius?: number;
     center?: OptionalVector2;
     rotation?: number;
+    closed?: boolean;
 };
 declare class UtilityCanvas {
     el: HTMLCanvasElement;
@@ -99,8 +100,8 @@ declare class UtilityCanvas {
         margin?: Margin;
     }): this;
     fillImagePattern(image: CanvasImage, { repeat, stagger, rotation, offset: { x, y }, margin: { x: mx, y: my }, anchors: { x: ax, y: ay }, ...settings }?: {
-        repeat?: (Vector2 | null);
-        stagger?: ('x' | 'y' | null);
+        repeat?: Vector2;
+        stagger?: ('x' | 'y');
         rotation?: number;
         offset?: OptionalVector2;
         margin?: OptionalVector2;
@@ -111,34 +112,27 @@ declare class UtilityCanvas {
     closePath(): this;
     rect({ offset: { x, y }, width, height, fill, stroke, ...settings }: OffsetSettings & FillOrStroke): this;
     arc({ center: { x, y }, radius, startAngle, endAngle, cc, fill, stroke, ...settings }: FillOrStroke & ArcSettings): this;
-    ellipse({ center: { x, y }, radii: { x: rx, y: ry }, rotation, startAngle, endAngle, cc, fill, stroke, ...settings }: FillOrStroke & EllipseSettings): this;
+    ellipse({ center: { x, y }, radius: { x: rx, y: ry }, rotation, startAngle, endAngle, cc, fill, stroke, ...settings }: FillOrStroke & EllipseSettings): this;
     roundedRectangle({ offset: { x, y }, width, height, radius, fill, stroke, ...settings }: OffsetSettings & FillOrStroke & {
         radius: Corner;
     }): this;
-    polygon(points?: PolygonPoints, { closed, fill, stroke, ...settings }?: FillOrStroke & {
+    polyline(points?: PolylinePoints, { closed, fill, stroke, ...settings }?: FillOrStroke & {
         closed?: boolean;
     }): this;
-    shape({ sides, sideLength, radius, center: { x, y }, rotation, ...settings }: ShapeSettings): this;
-    triangle({ sideLength, ...settings }: Omit<ShapeSettings, 'sides'>): this;
-    square(settings: Omit<ShapeSettings, 'sides'>): this;
-    rectangle({ width, height, center: { x, y }, rotation, ...settings }: Omit<ShapeSettings, 'sides' | 'radius' | 'sideLength'> & {
+    polygon({ sides, sideLength, radius, center: { x, y }, rotation, closed, ...settings }: PolygonSettings): this;
+    rectangle({ width, height, center: { x, y }, rotation, closed, ...settings }: Omit<PolygonSettings, 'sides' | 'radius' | 'sideLength'> & {
         width: number;
         height: number;
     }): this;
-    pentagon(settings: Omit<ShapeSettings, 'sides'>): this;
-    hexagon(settings: Omit<ShapeSettings, 'sides'>): this;
-    heptagon(settings: Omit<ShapeSettings, 'sides'>): this;
-    octagon(settings: Omit<ShapeSettings, 'sides'>): this;
-    nonagon(settings: Omit<ShapeSettings, 'sides'>): this;
-    drawImage(image: CanvasImage, { position: { x, y }, rotation, scale, ...settings }?: {
-        position?: Vector2;
+    drawImage(image: CanvasImage, { center: { x, y }, rotation, scale, ...settings }?: {
+        center?: Vector2;
         rotation?: number;
         scale?: number;
     }): this;
-    drawImageWithDimensions(image: CanvasImage, { width, height, position: { x, y }, rotation, ...settings }: {
+    drawImageWithDimensions(image: CanvasImage, { width, height, center: { x, y }, rotation, ...settings }: {
         width: number;
         height: number;
-        position?: Vector2;
+        center?: Vector2;
         rotation?: number;
     }): this;
     chromaKey(color: (string | {

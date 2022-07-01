@@ -17,7 +17,7 @@ type Anchors = {
 }
 type Aspect = 'fill' | 'fit' | boolean;
 
-type PolygonPoints = [ number, number ][];
+type PolylinePoints = [ number, number ][];
 
 type ArcSettings = {
 	center?: Vector2,
@@ -27,7 +27,7 @@ type ArcSettings = {
 	cc?: boolean
 }
 type EllipseSettings = Omit<ArcSettings, 'radius'> & {
-	radii?: Vector2,
+	radius?: Vector2,
 	rotation?: number
 }
 
@@ -60,12 +60,13 @@ type OffsetSettings = SizeSettings & {
 	offset?: OptionalVector2
 }
 
-type ShapeSettings = {
+type PolygonSettings = {
 	sides: number,
 	sideLength?: number,
 	radius?: number,
 	center?: OptionalVector2,
-	rotation?: number
+	rotation?: number,
+	closed?: boolean
 }
 
 class UtilityCanvas {
@@ -268,16 +269,16 @@ class UtilityCanvas {
 	fillImagePattern(
 		image: CanvasImage,
 		{
-			repeat = null,
-			stagger = null,
+			repeat = undefined,
+			stagger = undefined,
 			rotation = 0,
 			offset: { x = 0, y = 0 } = {},
 			margin: { x: mx = 0, y: my = 0 } = {},
 			anchors: { x: ax = 'center', y: ay = 'center' } = {},
 			...settings
 		}: {
-			repeat?: (Vector2 | null),
-			stagger?: ('x' | 'y' | null),
+			repeat?: Vector2,
+			stagger?: ('x' | 'y'),
 			rotation?: number,
 			offset?: OptionalVector2,
 			margin?: OptionalVector2,
@@ -413,7 +414,7 @@ class UtilityCanvas {
 
 	ellipse({
 		center: { x = this.width / 2, y = this.height / 2 } = { x: this.width / 2, y: this.height / 2 },
-		radii: { x: rx = this.width / 2, y: ry = this.height / 2 } = { x: this.width / 2, y: this.height / 2 },
+		radius: { x: rx = this.width / 2, y: ry = this.height / 2 } = { x: this.width / 2, y: this.height / 2 },
 		rotation = 0,
 		startAngle = 0,
 		endAngle = 2 * Math.PI,
@@ -439,7 +440,7 @@ class UtilityCanvas {
 	}
 
 	roundedRectangle({
-		offset: { x = 0, y = 0 } = { x: 0, y: 0 },
+		offset: { x = 0, y = 0 } = {},
 		width = this.width,
 		height = this.height,
 		radius,
@@ -477,10 +478,10 @@ class UtilityCanvas {
 		return this;
 	}
 
-	polygon(
-		points: PolygonPoints = [],
+	polyline(
+		points: PolylinePoints = [],
 		{
-			closed = true,
+			closed = false,
 			fill = false,
 			stroke = false,
 			...settings
@@ -489,7 +490,7 @@ class UtilityCanvas {
 		} = {}
 	) {
 		if (points.length < 2) {
-			console.warn('Polygon not built: points array must have at least 2 points');
+			console.warn('Polyline not built: points array must have at least 2 points');
 			return this;
 		}
 
@@ -511,20 +512,21 @@ class UtilityCanvas {
 		return this;
 	}
 
-	shape({
+	polygon({
 		sides,
 		sideLength = undefined,
 		radius = undefined,
 		center: { x = this.width / 2, y = this.height / 2 } = {},
 		rotation = 0,
+		closed = true,
 		...settings
-	}: ShapeSettings) {
+	}: PolygonSettings) {
 		if (!sideLength && !radius) {
-			console.warn('Error creating shape: sideLength or radius must be specified');
+			console.warn('Error creating polygon: sideLength or radius must be specified');
 			return this;
 		}
 		const r = radius || (sideLength as number) * Math.sin(Math.PI / sides);
-		const points: PolygonPoints = [];
+		const points: PolylinePoints = [];
 		for (let i = 0; i < sides; i++) {
 			const angle = rotation + i * 2 * Math.PI / sides;
 			points.push([
@@ -532,15 +534,7 @@ class UtilityCanvas {
 				y + r * Math.cos(angle)
 			])
 		}
-		return this.polygon(points, settings);
-	}
-
-	triangle({ sideLength, ...settings }: Omit<ShapeSettings, 'sides'>) {
-		return this.shape({ sides: 3, ...settings });
-	}
-
-	square(settings: Omit<ShapeSettings, 'sides'>) {
-		return this.shape({ sides: 4, ...settings });
+		return this.polyline(points, { closed, ...settings });
 	}
 
 	rectangle({
@@ -548,15 +542,16 @@ class UtilityCanvas {
 		height,
 		center: { x = this.width / 2, y = this.height / 2 } = {},
 		rotation = 0,
+		closed = true,
 		...settings
-	}: Omit<ShapeSettings, 'sides' | 'radius' | 'sideLength'> & {
+	}: Omit<PolygonSettings, 'sides' | 'radius' | 'sideLength'> & {
 		width: number,
 		height: number
 	}) {
 		const r = Math.sqrt((width / 2)^2 + (height / 2)^2);
 		const angle = Math.atan2(width, height);
 		const reflectAngle = Math.PI - angle;
-		const points: PolygonPoints = [];
+		const points: PolylinePoints = [];
 		for (let i = 0; i < 4; i++) {
 			const currAngle = rotation + Math.floor(i / 2) * Math.PI + i % 2 ? reflectAngle: angle
 			points.push([
@@ -564,38 +559,18 @@ class UtilityCanvas {
 				y + r * Math.cos(currAngle)
 			])
 		}
-		return this.polygon(points, settings);
-	}
-
-	pentagon(settings: Omit<ShapeSettings, 'sides'>) {
-		return this.shape({ sides: 5, ...settings });
-	}
-
-	hexagon(settings: Omit<ShapeSettings, 'sides'>) {
-		return this.shape({ sides: 6, ...settings });
-	}
-
-	heptagon(settings: Omit<ShapeSettings, 'sides'>) {
-		return this.shape({ sides: 7, ...settings });
-	}
-
-	octagon(settings: Omit<ShapeSettings, 'sides'>) {
-		return this.shape({ sides: 8, ...settings });
-	}
-
-	nonagon(settings: Omit<ShapeSettings, 'sides'>) {
-		return this.shape({ sides: 9, ...settings });
+		return this.polyline(points, { closed, ...settings });
 	}
 
 	drawImage(
 		image: CanvasImage,
 		{
-			position: { x = 0, y = 0 } = { x: 0, y: 0 },
+			center: { x = 0, y = 0 } = { x: 0, y: 0 },
 			rotation = 0,
 			scale = 1,
 			...settings
 		}: {
-			position?: Vector2,
+			center?: Vector2,
 			rotation?: number,
 			scale?: number
 		} = {}
@@ -621,13 +596,13 @@ class UtilityCanvas {
 		{
 			width,
 			height,
-			position: { x = 0, y = 0 } = { x: 0, y: 0 },
+			center: { x = 0, y = 0 } = { x: 0, y: 0 },
 			rotation = 0,
 			...settings
 		}: {
 			width: number,
 			height: number,
-			position?: Vector2,
+			center?: Vector2,
 			rotation?: number
 		}
 	) {
