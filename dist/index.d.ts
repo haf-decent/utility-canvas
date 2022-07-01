@@ -1,18 +1,70 @@
 import { clamp, hexToRgb } from './utils';
-declare type Vector2 = {
-    x: number;
-    y: number;
+declare type Vector2<T = number> = {
+    x: T;
+    y: T;
+};
+declare type OptionalVector2<T = number> = {
+    x?: T;
+    y?: T;
+};
+declare type Margin = number | {
+    t?: number;
+    l?: number;
+    r?: number;
+    b?: number;
+};
+declare type Corner = number | {
+    tl?: number;
+    tr?: number;
+    bl?: number;
+    br?: number;
+};
+declare type Anchors = {
+    x?: 'left' | 'center' | 'right';
+    y?: 'top' | 'center' | 'bottom';
+};
+declare type Aspect = 'fill' | 'fit' | boolean;
+declare type PolygonPoints = [number, number][];
+declare type ArcSettings = {
+    center?: Vector2;
+    radius?: number;
+    startAngle?: 0;
+    endAngle?: number;
+    cc?: boolean;
+};
+declare type EllipseSettings = Omit<ArcSettings, 'radius'> & {
+    radii?: Vector2;
+    rotation?: number;
+};
+declare type CanvasFill = string | CanvasGradient | CanvasPattern;
+declare type CanvasImage = HTMLImageElement | HTMLCanvasElement;
+declare type StrokeSettings = {
+    thickness?: number;
+    color?: CanvasFill;
+};
+declare type FillOrStroke = {
+    fill?: boolean;
+    stroke?: boolean;
 };
 declare type ContextSettings = {
-    color?: (string | CanvasGradient | CanvasPattern);
-    strokeOptions?: object;
+    color?: CanvasFill;
+    strokeSettings?: StrokeSettings;
     alpha?: number;
     operation?: string;
 };
-declare type OffsetSettings = {
-    offset?: Vector2;
+declare type SizeSettings = {
     width?: number;
     height?: number;
+};
+declare type OffsetSettings = SizeSettings & {
+    offset?: OptionalVector2;
+};
+declare type ShapeSettings = {
+    sides: number;
+    sideLength?: number;
+    radius?: number;
+    center?: OptionalVector2;
+    rotation?: number;
 };
 declare class UtilityCanvas {
     el: HTMLCanvasElement;
@@ -20,115 +72,70 @@ declare class UtilityCanvas {
     height: number;
     ctx: CanvasRenderingContext2D;
     static COMPOSITE: {
-        [key: string]: string;
+        [key: string]: GlobalCompositeOperation;
     };
-    constructor({ canvas, width, height, parent }?: {
+    constructor({ canvas, width, height, parent }?: SizeSettings & {
         canvas?: HTMLCanvasElement;
-        width?: number;
-        height?: number;
         parent?: HTMLElement | null;
     });
-    resize({ width, height }?: {
-        width?: number;
-        height?: number;
-    }): this;
+    resize({ width, height }?: SizeSettings): this;
     clearRect({ offset: { x, y }, width, height }?: OffsetSettings): this;
     clear(): this;
-    setColor(color?: (string | CanvasGradient | CanvasPattern)): this;
-    setStroke({ thickness, color }?: {
-        thickness?: number;
-        color?: (string | CanvasGradient | CanvasPattern);
-    }): this;
-    setCompositeOperation(operation?: string): this;
+    setColor(color?: CanvasFill): this;
+    setStroke({ thickness, color }?: StrokeSettings): this;
+    setCompositeOperation(operation?: (string | GlobalCompositeOperation)): this;
     setAlpha(alpha?: number): this;
     _parseSettings(settings?: ContextSettings): this;
     fill(settings?: ContextSettings): this;
     fillRect({ offset: { x, y }, width, height, ...settings }?: OffsetSettings): this;
-    fillImage(image: (HTMLImageElement | HTMLCanvasElement), { preserveAspect, ...settings }?: {
-        preserveAspect?: (string | boolean);
+    fillImage(image: CanvasImage, { preserveAspect, ...settings }?: {
+        preserveAspect?: Aspect;
     }): this;
-    fillOrFitImage(image: (HTMLImageElement | HTMLCanvasElement), { fill, aspect, anchors: { x: ax, y: ay }, offset: { x, y }, margin, ...settings }?: {
+    fillOrFitImage(image: CanvasImage, { fill, aspect, anchors: { x: ax, y: ay }, offset: { x, y }, margin, ...settings }?: {
         fill?: boolean;
         aspect?: (number | null);
-        anchors?: {
-            x?: string;
-            y?: string;
-        };
-        offset?: {
-            x?: number;
-            y?: number;
-        };
-        margin?: (number | {
-            t?: number;
-            l?: number;
-            r?: number;
-            b?: number;
-        });
+        anchors?: Anchors;
+        offset?: OptionalVector2;
+        margin?: Margin;
     }): this;
-    fillPattern(image: (HTMLImageElement | HTMLCanvasElement), { repeat, stagger, rotation, offset: { x, y }, margin: { x: mx, y: my }, anchors: { x: ax, y: ay }, ...settings }?: {
+    fillImagePattern(image: CanvasImage, { repeat, stagger, rotation, offset: { x, y }, margin: { x: mx, y: my }, anchors: { x: ax, y: ay }, ...settings }?: {
         repeat?: (Vector2 | null);
-        stagger?: (string | null);
+        stagger?: ('x' | 'y' | null);
         rotation?: number;
-        offset?: Vector2;
-        margin?: Vector2;
-        anchors?: {
-            x?: string;
-            y?: string;
-        };
+        offset?: OptionalVector2;
+        margin?: OptionalVector2;
+        anchors?: Anchors;
     }): this;
     beginPath(): this;
     stroke(settings?: ContextSettings): this;
     closePath(): this;
-    rectangle({ offset: { x, y }, width, height, fill, stroke, ...settings }: {
-        offset?: Vector2;
-        width?: number;
-        height?: number;
-        fill?: boolean;
-        stroke?: boolean;
+    rect({ offset: { x, y }, width, height, fill, stroke, ...settings }: OffsetSettings & FillOrStroke): this;
+    arc({ center: { x, y }, radius, startAngle, endAngle, cc, fill, stroke, ...settings }: FillOrStroke & ArcSettings): this;
+    ellipse({ center: { x, y }, radii: { x: rx, y: ry }, rotation, startAngle, endAngle, cc, fill, stroke, ...settings }: FillOrStroke & EllipseSettings): this;
+    roundedRectangle({ offset: { x, y }, width, height, radius, fill, stroke, ...settings }: OffsetSettings & FillOrStroke & {
+        radius: Corner;
     }): this;
-    arc({ center: { x, y }, radius, startAngle, endAngle, cc, fill, stroke, ...settings }: {
-        center?: Vector2;
-        radius?: number;
-        startAngle?: 0;
-        endAngle?: number;
-        cc?: boolean;
-        fill?: boolean;
-        stroke?: boolean;
-    }): this;
-    ellipse({ center: { x, y }, radius: { x: rx, y: ry }, rotation, startAngle, endAngle, cc, fill, stroke, ...settings }: {
-        center?: Vector2;
-        radius?: Vector2;
-        rotation?: number;
-        startAngle?: 0;
-        endAngle?: number;
-        cc?: boolean;
-        fill?: boolean;
-        stroke?: boolean;
-    }): this;
-    roundedRectangle({ offset: { x, y }, width, height, radius, fill, stroke, ...settings }: {
-        offset?: Vector2;
-        width?: number;
-        height?: number;
-        radius: (number | {
-            tl: number;
-            tr: number;
-            bl: number;
-            br: number;
-        });
-        fill?: boolean;
-        stroke?: boolean;
-    }): this;
-    polygon(points?: [number, number][], { closed, fill, stroke, ...settings }?: {
+    polygon(points?: PolygonPoints, { closed, fill, stroke, ...settings }?: FillOrStroke & {
         closed?: boolean;
-        fill?: boolean;
-        stroke?: boolean;
     }): this;
-    drawImage(image: (HTMLImageElement | HTMLCanvasElement), { position: { x, y }, rotation, scale, ...settings }?: {
+    shape({ sides, sideLength, radius, center: { x, y }, rotation, ...settings }: ShapeSettings): this;
+    triangle({ sideLength, ...settings }: Omit<ShapeSettings, 'sides'>): this;
+    square(settings: Omit<ShapeSettings, 'sides'>): this;
+    rectangle({ width, height, center: { x, y }, rotation, ...settings }: Omit<ShapeSettings, 'sides' | 'radius' | 'sideLength'> & {
+        width: number;
+        height: number;
+    }): this;
+    pentagon(settings: Omit<ShapeSettings, 'sides'>): this;
+    hexagon(settings: Omit<ShapeSettings, 'sides'>): this;
+    heptagon(settings: Omit<ShapeSettings, 'sides'>): this;
+    octagon(settings: Omit<ShapeSettings, 'sides'>): this;
+    nonagon(settings: Omit<ShapeSettings, 'sides'>): this;
+    drawImage(image: CanvasImage, { position: { x, y }, rotation, scale, ...settings }?: {
         position?: Vector2;
         rotation?: number;
         scale?: number;
     }): this;
-    drawImageWithDimensions(image: (HTMLImageElement | HTMLCanvasElement), { width, height, position: { x, y }, rotation, ...settings }: {
+    drawImageWithDimensions(image: CanvasImage, { width, height, position: { x, y }, rotation, ...settings }: {
         width: number;
         height: number;
         position?: Vector2;
