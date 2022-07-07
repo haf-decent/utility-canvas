@@ -2,16 +2,18 @@
   "name": "utility-canvas",
   "version": "1.0.0",
   "description": "Wrapper for HTML Canvas Element adding helpful methods and a simplified interface",
-  "main": "./dist/utility-canvas.min.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/esm/index.js",
+  "types": "./dist/esm/index.d.ts",
   "devDependencies": {
     "ts-loader": "^9.2.5",
     "typescript": "^4.7.4",
     "webpack-cli": "^4.8.0"
   },
   "scripts": {
-    "build": "webpack",
+    "build": "npm run build-cjs && npm run build-esm",
+    "build-cjs": "tsc --module commonjs --outDir dist/cjs",
+    "build-esm": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
